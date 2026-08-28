@@ -1,0 +1,86 @@
+* Disclaimer:
+* THIS FILE IS PROVIDED “AS IS” AND WITH:
+* (A)  NO WARRANTY OF ANY KIND, express, implied or statutory, including any implied warranties of merchantability or 
+* fitness for a particular purpose, which Mentor Graphics disclaims to the maximum extent permitted by applicable law; and
+* (B)  NO INDEMNIFICATION FOR INFRINGEMENT OF INTELLECTUAL PROPERTY RIGHTS.
+* LIMITATION OF LIABILITY:  IN NO EVENT SHALL MENTOR GRAPHICS OR ITS LICENSORS BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, 
+* INCIDENTAL, OR CONSEQUENTIAL DAMAGES (INCLUDING LOST PROFITS OR SAVINGS) WHATSOEVER, WHETHER BASED ON CONTRACT, TORT OR 
+* ANY OTHER LEGAL THEORY, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+* © 2017 Mentor Graphics Corporation. All rights reserved.
+
+* Comparator, for low-swing input clock signals
+* Specifications, with Cload= 50fF,  Vinp-Vinn=200mV@vdd/2, 1ns input transition time      
+*          Min   Typ   Max                    
+* Vhyst    10    19    30    mV
+* delay          2.8   4     ns
+* Idd      200   441   700   uA    Ibias=9uA
+* Iddq(pd) 0    <0.01  0.1   uA
+ 
+* in/out nodes
+* ibias  : 7~19 uA bias current in from VDD
+* inn    : inverting input
+* inp    : non-inverting input
+* out    : digital output
+* pd     : power-down digital input, active high
+* xpd    : pd-inverted digital input
+* vdda   : 3.3 VDC, power in 
+* vssa   : ground
+*.subckt COMP1 ibias inn inp out pd xpd vdda vssa 
+
+X1 ibias inn inp out pd xpd vdda 0 COMP1
+
+.TEMP 27
+.param vddmin=3.0 vddnom=3.3 vddmax=3.6
+.param vddi=3.3
+
+Cload out   0  50e-15
+
+Rbias ibias vdda 300k
+
+VDD   vdda  0   3.3
+
+* Test description
+* apply VDD/2=1.65 to one input, slowly ramp the other input from VDDnom/2-0.5 to VDDnom/2+0.5, and then down, and measure when it switches
+* measure Iddq when both inputs at mid-rail
+* then apply fast input, and measure delay
+
+Vpd  pd   0 pwl(0,       3.3,
++               1n,      0)
+Vxpd xpd  0 pwl(0,       0,
++               1n,      3.3)
+
+Vref inn  0 pwl(0,       1.65,
++               20u,     1.65,
++               21u,     1.75,
++               21.001u, 1.55,
++               22.000u, 1.55,
++               22.001u, 1.75)
+
+Vin  inp  0 pwl(0,       1.55,      
++               10u,     1.75,  
++               20u,     1.55,  
++               21u,     1.55,  
++               21.001u, 1.75, 
++               22.000u, 1.75,
++               22.001u, 1.55) 
+
+.MEAS  risehyst  FIND  v(inp) WHEN v(out) val=1.65 td=1u     
+.MEAS  fallhyst  FIND  v(inp) WHEN v(out) val=1.65 td=10u    
+.MEAS  risedelay TRIG  v(inp) val=1.65 td=21u  TARG  v(out) val=1.65  
+.MEAS  falldelay TRIG  v(inp) val=1.65 td=22u  TARG  v(out) val=1.65  
+.MEAS  Vhyst     PARAM 'risehyst-fallhyst'
+.MEAS  delay     PARAM max(risedelay, falldelay)
+.MEAS  Idd       FIND  i(VDD)  at=5u
+.MEAS  Iddq      FIND  i(VDD)  at=0
+
+.INCLUDE subcircuit_files/COMP1.sub
+.INCLUDE subcircuit_files/PRIMITIVE.sub
+
+*.INCLUDE process_models/fastN_fastP.process
+*.INCLUDE process_models/slowN_fastP.process
+.INCLUDE process_models/typical.process
+*.INCLUDE process_models/fastN_slowP.process
+*.INCLUDE process_models/slowN_slowP.process
+.TRAN 1u 23u 0.000000
+.END
+

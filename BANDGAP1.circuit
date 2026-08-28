@@ -1,0 +1,130 @@
+* ============================================================
+* TESTBENCH AMELIORE - BANDGAP1
+* Couverture de test etendue - IEEE Std 2427-2025
+*
+* Specifications :
+*   Vout  : 1.184 - 1.214 V  (typ 1.189 V)
+*   PSRR  : 0.1   - 0.2   %
+*   Rout  : 20    - 60    kohm
+*   Iddq  : 10    - 40    uA
+*
+* Valeurs nominales mesurees (TT 27C) :
+*   Vvbe        = 0.608 V
+*   Vnet1       = 0.668 V
+*   Vnet31      = 0.691 V
+*   Vnet43      = 0.667 V
+*   Vnet58      = 1.336 V
+*   Vnet65      = 2.476 V
+*   DeltaV_PTAT = 0.060 V
+*   I_R1_uA     = 0.595 uA
+* ============================================================
+
+* ============================================================
+* INSTANCE DU CIRCUIT
+* ============================================================
+X1 VDDA vref 0 BANDGAP1
+
+* ============================================================
+* PARAMETRES
+* ============================================================
+.TEMP 27
+.param vddmin=3.0 vddnom=3.3 vddmax=3.6
+
+* ============================================================
+* CHARGE
+* Vblock = 1.189V avant 35ms -> aucun courant dans Rload
+* Vblock = 0V    apres 35ms  -> charge active (1 Mohm)
+* ============================================================
+Cload   vref    0       50e-15
+Rload   vref    nblock  1000000
+Vblock  nblock  0  pwl( 0m,     1.189,
++                        34.9m,  1.189,
++                        35m,    1.189,
++                        35.1m,  0)
+
+* ============================================================
+* ALIMENTATION TRANSITOIRE
+* 0m  - 10ms : VDDmin no load -> VoutNoLoadVimin
+* 15m - 20ms : VDDmax no load -> VoutNoLoadVimax + PSRR
+* 25m - 30ms : VDDnom no load -> VoutNoLoadVinom + noeuds internes
+* 35m - 40ms : VDDnom load ON -> Vout__LoadVinom + Rout + Iddq
+* ============================================================
+* Source DC transitoire sur noeud intermediaire vdda_dc
+VDDI vdda_dc  0 pwl( 0m,    3.0,
++                    15m,   3.6,
++                    20m,   3.6,
++                    25m,   3.3)
+
+* Source AC en serie : VDDA = vdda_dc + perturbation AC
+* Pour mesure PSRR frequentiel : AC=1 injecte sur alimentation
+* En transitoire : AC=0 donc pas d effet
+Vac_serie VDDA vdda_dc DC 0 AC 1
+
+* ============================================================
+* ANALYSES
+* ============================================================
+.TRAN 5m 51m 0
+.AC DEC 20 1 10Meg
+
+* ============================================================
+* MESURES ORIGINALES
+* ============================================================
+.MEAS TRAN VoutNoLoadVimin  FIND v(vref) AT=10m
+.MEAS TRAN VoutNoLoadVimax  FIND v(vref) AT=20m
+.MEAS TRAN VoutNoLoadVinom  FIND v(vref) AT=30m
+.MEAS TRAN Vout__LoadVinom  FIND v(vref) AT=40m
+.MEAS TRAN PSRR_pct         PARAM '100*(VoutNoLoadVimax - VoutNoLoadVimin)/VoutNoLoadVimax'
+.MEAS TRAN Rout_kohm        PARAM '1000*(VoutNoLoadVinom - Vout__LoadVinom)/VoutNoLoadVinom'
+.MEAS TRAN IddqNoLoad       FIND i(VDDI) AT=10m
+
+* ============================================================
+* MESURES TENSIONS INTERNES (noeuds prefixes X1.)
+* Detectent les fautes qui se compensent sur Vref
+* ============================================================
+
+* Noeud VCTAT : base BJT q1 x5 (nominal 0.608 V)
+.MEAS TRAN Vvbe        FIND v(X1.vbe)   AT=30m
+
+* Noeud VTAT : apres R1, entree grille m5 (nominal 0.668 V)
+.MEAS TRAN Vnet1       FIND v(X1.net1)  AT=30m
+
+* Noeud entre R2 et emetteur q3 (nominal 0.691 V)
+.MEAS TRAN Vnet31      FIND v(X1.net31) AT=30m
+
+* Noeud collecteur q2 (nominal 0.667 V)
+.MEAS TRAN Vnet43      FIND v(X1.net43) AT=30m
+
+* Noeud grille miroir m4/m2 (nominal 1.336 V)
+.MEAS TRAN Vnet58      FIND v(X1.net58) AT=30m
+
+* Noeud grille m2/m6/m3/m5 (nominal 2.476 V)
+.MEAS TRAN Vnet65      FIND v(X1.net65) AT=30m
+
+* DeltaV = tension aux bornes de R1 = composante PTAT (nominal 0.060 V)
+* Detecte fautes sur xr1 et ratio BJT (q1x5 vs q2x1)
+.MEAS TRAN DeltaV_PTAT PARAM 'Vnet1 - Vvbe'
+
+* Courant PTAT estime via R1 nominal 101 kohm (nominal 0.595 uA)
+.MEAS TRAN I_R1_uA     PARAM '1e6*(Vnet1 - Vvbe)/101000'
+
+* ============================================================
+* MESURES PSRR FREQUENTIEL
+* Detecte fautes sur miroirs de courant (m2, m6, m3)
+* PSRR_dB = attenuation de la perturbation AC sur VDDA
+* ============================================================
+.MEAS AC PSRR_dB_1k    FIND vdb(vref) AT=1k
+.MEAS AC PSRR_dB_100k  FIND vdb(vref) AT=100k
+.MEAS AC PSRR_dB_1M    FIND vdb(vref) AT=1Meg
+
+* ============================================================
+* INCLUDES
+* ============================================================
+.INCLUDE BANDGAP1.sub
+.INCLUDE subcircuit_files/PRIMITIVE.sub
+.INCLUDE process_models/typical.process
+*.INCLUDE process_models/fastN_fastP.process
+*.INCLUDE process_models/slowN_fastP.process
+*.INCLUDE process_models/fastN_slowP.process
+*.INCLUDE process_models/slowN_slowP.process
+
+.END

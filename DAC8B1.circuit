@@ -1,0 +1,86 @@
+* Disclaimer:
+* THIS FILE IS PROVIDED “AS IS” AND WITH:
+* (A)  NO WARRANTY OF ANY KIND, express, implied or statutory, including any implied warranties of merchantability or 
+* fitness for a particular purpose, which Mentor Graphics disclaims to the maximum extent permitted by applicable law; and
+* (B)  NO INDEMNIFICATION FOR INFRINGEMENT OF INTELLECTUAL PROPERTY RIGHTS.
+* LIMITATION OF LIABILITY:  IN NO EVENT SHALL MENTOR GRAPHICS OR ITS LICENSORS BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, 
+* INCIDENTAL, OR CONSEQUENTIAL DAMAGES (INCLUDING LOST PROFITS OR SAVINGS) WHATSOEVER, WHETHER BASED ON CONTRACT, TORT OR 
+* ANY OTHER LEGAL THEORY, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+* © 2017 Mentor Graphics Corporation. All rights reserved.
+
+* Digital to analog converter, using resistor division, with 8 bit resolution, and unbuffered 20kohm output
+* Specifications, with Cload= 50fF 
+*            Min   Typ   Max                    
+* DNL   +/-        0.25  0.33    LSB
+* INL   +/-        0.25  0.40    LSB
+*
+* in/out nodes
+* dacout : analog output voltage
+* rn     : input negative reference voltage (within CMR of buffer's input)
+* rp     : input positive reference voltage (within CMR of buffer's input)
+* b0~b7  : digital inputs (b0 is LSB), Vdacout=digitalIn/256*(Vrp-Vrn)
+* vdda   : 3.3 VDC, power in 
+* gnda   : Vss ground
+*.subckt DAC8B1 dacout rn rp b0 b1 b2 b3 b4 b5 b6 b7 vdda gnda
+
+X1 dacout rn rp b0 b1 b2 b3 b4 b5 b6 b7 vdda 0 DAC8B1
+
+.TEMP 27
+.param vddnom=3.3
+
+VDD vdda 0 3.3
+
+VRP rp   0 2v
+VRN rn   0 1v
+
+Cload  dacout  0  50e-15
+
+* This test pattern applies digital ramp across full range
+*vin0 b0 0 pulse (0 3.3    99n 1n 1n    99n   200n)
+*vin1 b1 0 pulse (0 3.3   199n 1n 1n   199n   400n)
+*vin2 b2 0 pulse (0 3.3   399n 1n 1n   399n   800n)
+*vin3 b3 0 pulse (0 3.3   799n 1n 1n   799n  1600n)
+*vin4 b4 0 pulse (0 3.3  1599n 1n 1n  1599n  3200n)
+*vin5 b5 0 pulse (0 3.3  3199n 1n 1n  3199n  6400n)
+*vin6 b6 0 pulse (0 3.3  6399n 1n 1n  6399n 12800n)
+*vin7 b7 0 pulse (0 3.3 12799n 1n 1n 12799n 25600n)
+
+* Alternative testbench for very fast test of major carriers
+* It measures Vdacout for digital codes 00000000 00000001 00000010 00000100 00001000 00010000 00100000 01000000 10000000 11111111
+* and checks that it is within 2 mV of correct value
+*                  vhi vlo tdelay trise tfall tduration bits 
+vin7 b7 0 pattern 3.3 0   0      1n    1n    99n        0        0        0        0        0        0        0        0        1        1
+vin6 b6 0 pattern 3.3 0   0      1n    1n    99n         0        0        0        0        0        0        0        1        0        1
+vin5 b5 0 pattern 3.3 0   0      1n    1n    99n          0        0        0        0        0        0        1        0        0        1
+vin4 b4 0 pattern 3.3 0   0      1n    1n    99n           0        0        0        0        0        1        0        0        0        1
+vin3 b3 0 pattern 3.3 0   0      1n    1n    99n            0        0        0        0        1        0        0        0        0        1
+vin2 b2 0 pattern 3.3 0   0      1n    1n    99n             0        0        0        1        0        0        0        0        0        1
+vin1 b1 0 pattern 3.3 0   0      1n    1n    99n              0        0        1        0        0        0        0        0        0        1
+vin0 b0 0 pattern 3.3 0   0      1n    1n    99n               0        1        0        0        0        0        0        0        0        1
+
+
+* Analysis for alternative testbench 
+.MEAS V00000000  FIND v(dacout) at=50n
+.MEAS V00000001  FIND v(dacout) at=150n
+.MEAS V00000010  FIND v(dacout) at=250n
+.MEAS V00000100  FIND v(dacout) at=350n
+.MEAS V00001000  FIND v(dacout) at=450n
+.MEAS V00010000  FIND v(dacout) at=550n
+.MEAS V00100000  FIND v(dacout) at=650n
+.MEAS V01000000  FIND v(dacout) at=750n
+.MEAS V10000000  FIND v(dacout) at=850n
+.MEAS V11111111  FIND v(dacout) at=950n
+
+.probe v
+
+.INCLUDE subcircuit_files/DAC8B1.sub
+.INCLUDE subcircuit_files/PRIMITIVE.sub
+
+*.INCLUDE process_models/fastN_fastP.process
+*.INCLUDE process_models/slowN_fastP.process
+.INCLUDE process_models/typical.process
+*.INCLUDE process_models/fastN_slowP.process
+*.INCLUDE process_models/slowN_slowP.process
+.TRAN 1n 1200n 0
+.END
+
