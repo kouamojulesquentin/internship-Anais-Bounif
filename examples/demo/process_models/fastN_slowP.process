@@ -1,0 +1,4 @@
+* Fichier de process generique/placeholder - corner fastN_slowP
+* Ce circuit DEMO n'utilise que des R/C ideales SPICE natives,
+* aucun modele de transistor n'est necessaire ici.
+* Remplacez ce fichier par vos vrais modeles de fonderie pour un circuit reel.

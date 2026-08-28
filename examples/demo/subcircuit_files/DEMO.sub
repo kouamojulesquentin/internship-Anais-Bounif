@@ -1,0 +1,4 @@
+.subckt DEMO vin vout gnd
+R1 vin vout 1k
+C1 vout gnd 1u
+.ends

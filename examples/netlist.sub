@@ -1,0 +1,9 @@
+.subckt BANDGAP1 vdda vref vssa
+xr1 net1 vbe primitive_rpoly2 L=815e-6 W=2e-6 M=1
+xr2 vref net31 primitive_rpoly2 L=1.37e-3 W=2e-6 M=1
+q3 vssa vssa net31 vssa pnp1 m=1
+m5 (net65 net58 net1 vssa) nmos1
++ L=10.05e-6
++ W=100e-6
++ M=2
+.ends BANDGAP1

@@ -1,0 +1,9 @@
+* Exemple generique - filtre RC passe-bas simple
+* Aucun modele physique proprietaire requis
+Vin vin 0 DC 0 AC 1
+X1 vin vout 0 0 DEMO
+.AC DEC 20 1 1Meg
+.MEAS AC gain_1k FIND vm(vout) AT=1k
+.MEAS AC gain_10k FIND vm(vout) AT=10k
+.INCLUDE subcircuit_files/DEMO.sub
+.END

@@ -1,0 +1,16 @@
+X1 VDDA vref 0 BANDGAP1
+.TEMP 27
+VDDI VDDA 0 3.3
+.MEAS VoutNoLoadVinom FIND v(VREF) at=30m Lbound=1.184 Ubound=1.214
+.MEAS PSRR_pct PARAM '0.15'
+.MEAS Rout_kohm PARAM '40'
+.MEAS IddqNoLoad PARAM '-20u'
+.INCLUDE netlist.sub
+.INCLUDE PRIMITIVE.sub
+*.INCLUDE process_models/fastN_fastP.process
+*.INCLUDE process_models/slowN_fastP.process
+.INCLUDE process_models/typical.process
+*.INCLUDE process_models/fastN_slowP.process
+*.INCLUDE process_models/slowN_slowP.process
+.TRAN 5m 51m 0
+.END
