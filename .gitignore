@@ -1,0 +1,26 @@
+# Resultats de simulation (peuvent atteindre plusieurs Go, propres a chaque run)
+results_*/
+results/*
+!results/.gitkeep
+
+# Cache Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+build/
+dist/
+*.egg-info/
+
+# Fichiers temporaires Spectre / AHDL
+*.ahdlSimDB/
+*.raw/
+*.log
+*.mt0
+*.mt1
+*.mt2
+*.ic0
+
+# Environnement
+.venv/
+venv/
