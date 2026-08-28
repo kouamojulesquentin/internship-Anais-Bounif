@@ -1,16 +1,15 @@
-# Démo — Utiliser le framework en 5 minutes
+# Démo — Utiliser le framework 
 
 Ce guide montre comment lancer le framework de bout en bout sur un circuit
 totalement autonome (`DEMO`, un simple filtre RC passe-bas), fourni avec le
-dépôt. Aucun modèle de fonderie n'est nécessaire — c'est le point de départ
-recommandé avant de brancher un circuit réel.
+dépôt. 
 
 ---
 
 ## 1. Prérequis
 
-- Spectre (Cadence) installé et accessible (`which spectre`).
-- Python 3.6+. Aucune installation supplémentaire n'est requise.
+- Spectre (Cadence) installé et accessible .
+- Python 3.6+. 
 
 Si `spectre` nécessite de sourcer un script d'environnement avant d'être
 disponible dans le terminal :
@@ -201,6 +200,4 @@ Puis :
 | `./test_circuit.sh NOM` | Campagne complète |
 | `./run_all.sh` | Campagne complète sur tous les circuits enregistrés |
 
-Voir `README.md` pour la liste complète des pièges connus et leurs
-solutions (syntaxe `Lbound=`/`Ubound=`, substitution `{param}`, circuits
-hiérarchiques, etc.).
+
