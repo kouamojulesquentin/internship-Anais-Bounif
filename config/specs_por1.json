@@ -1,0 +1,7 @@
+{
+  "vswrise": {"min": 1.5, "max": 3.1},
+  "vswfall": {"min": 1.4, "max": 2.9},
+  "vhyst": {"min": 0.100, "max": 0.250},
+  "idd": {"min": -8e-6, "max": -2e-6},
+  "iddq": {"min": -1e-6, "max": 0}
+}

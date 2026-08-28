@@ -1,0 +1,6 @@
+{
+  "gain": {"min": 1.8, "max": 3.0},
+  "rosc": {"min": 3e6, "max": 30e6},
+  "idd": {"min": -600e-6, "max": -50e-6},
+  "iddq": {"min": -0.01e-6, "max": 0}
+}

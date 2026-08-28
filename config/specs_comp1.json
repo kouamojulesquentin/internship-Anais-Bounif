@@ -1,0 +1,6 @@
+{
+  "vhyst": {"min": 0.010, "max": 0.030},
+  "delay": {"min": 0, "max": 4e-9},
+  "idd": {"min": -700e-6, "max": -200e-6},
+  "iddq": {"min": -1e-6, "max": 0}
+}

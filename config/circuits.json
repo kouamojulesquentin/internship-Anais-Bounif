@@ -1,0 +1,44 @@
+{
+  "BANDGAP1": {
+    "netlist": "subcircuit_files/BANDGAP1.sub",
+    "testbench": "BANDGAP1.circuit",
+    "specs": "config/specs.json"
+  },
+  "OPAMP1": {
+    "netlist": "subcircuit_files/OPAMP1.sub",
+    "testbench": "OPAMP1.circuit",
+    "specs": "config/specs_opamp1.json"
+  },
+  "FILTER": {
+    "netlist": "subcircuit_files/FILTER.sub",
+    "testbench": "filter.circuit",
+    "specs": "config/specs_filter.json"
+  },
+  "COMP1": {
+    "netlist": "subcircuit_files/COMP1.sub",
+    "testbench": "COMP1.circuit",
+    "specs": "config/specs_comp1.json"
+  },
+  "OSC1": {
+    "netlist": "subcircuit_files/OSC1.sub",
+    "testbench": "OSC1.circuit",
+    "specs": "config/specs_osc1.json"
+  },
+  "POR1": {
+    "netlist": "subcircuit_files/POR1.sub",
+    "testbench": "POR1.circuit",
+    "specs": "config/specs_por1.json"
+  },
+  "DAC8B1": {
+    "netlist": "subcircuit_files/DAC8B1.sub",
+    "testbench": "DAC8B1.circuit",
+    "specs": "config/specs_dac8b1.json"
+  },
+  "DEMO": {
+    "netlist": "examples/demo/subcircuit_files/DEMO.sub",
+    "testbench": "examples/demo/DEMO.circuit",
+    "specs": "examples/demo/specs_demo.json",
+    "config": "config/framework_generic.json",
+    "process_dir": "examples/demo/process_models"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "spectre_command": "spectre",
+  "workers": 10,
+  "timeout_seconds": 600,
+  "corners": [
+    "TT",
+    "FF",
+    "FS",
+    "SF",
+    "SS"
+  ],
+  "process_files": {
+    "TT": "typical.process",
+    "FF": "fastN_fastP.process",
+    "FS": "fastN_slowP.process",
+    "SF": "slowN_fastP.process",
+    "SS": "slowN_slowP.process"
+  },
+  "fault_weight": 1.0,
+  "short_model": {
+    "value": "1m"
+  },
+  "open_model": {
+    "value": "1T"
+  },
+  "enable_parametric_faults": false,
+  "parametric_deviation_pct": 20.0
+}
